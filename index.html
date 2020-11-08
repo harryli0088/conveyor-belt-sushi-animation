@@ -10,6 +10,12 @@
       content="Conveyor Belt Sushi Animation Using Pure CSS"
     />
     <title>Conveyor Belt Sushi Animation</title>
+
+    <meta property="og:title" content="Conveyor Belt Sushi Animation" />
+    <meta property="og:description" content="I created this Conveyor Belt Sushi Animation Using Pure CSS" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://harryli0088.github.io/conveyor-belt-sushi-animation/" />
+    <meta property="og:image" content="https://harryli0088.github.io/conveyor-belt-sushi-animation/conveyor-belt-sushi-animation.png" />
   </head>
   <style>
     :root {
@@ -20,15 +26,19 @@
 
     body {
       margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      letter-spacing: 1px;
     }
 
     #app {
+      position: relative;
       text-align: center;
       background-color: #002740;
       height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
     }
 
     .conveyorBeltAnimation {
@@ -39,7 +49,7 @@
       animation: conveyor-belt 30s linear;
       animation-iteration-count: infinite;
       position: absolute;
-      top: 20vh;
+      top: 10vh;
       left: calc(-1 * var(--icon-size) / 2);
     }
 
@@ -64,10 +74,30 @@
         transform: rotate(-180deg) translateX( var(--offset-x)) translateY( var(--offset-y)); /* move back to the top, offset to the right */
       }
     }
+
+    #footer {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      color: white;
+      padding: 0.5em;
+      background: #17202A;
+    }
+
+    a {
+      color: #5DADE2;
+    }
+
+    a:visited {
+      color: #BB8FCE;
+    }
   </style>
   <body>
     <div id="app">
       <div class="conveyorBeltAnimation">
+        <!-- these spans are assigned evenly spaced out animation delays -->
+        <!-- the imgs are assigned random rotations -->
         <span class="icon" style="animation-delay: 0s;"><img src="./salmon_nigiri.svg" alt="salmon_nigiri" style="transform: rotate(219deg);"></span>
         <span class="icon" style="animation-delay: -1.66667s;"><img src="./tuna_nigiri.svg" alt="tuna_nigiri" style="transform: rotate(238deg);"></span>
         <span class="icon" style="animation-delay: -3.33333s;"><img src="./tuna_rolls.svg" alt="tuna_rolls" style="transform: rotate(35deg);"></span>
@@ -86,6 +116,10 @@
         <span class="icon" style="animation-delay: -25s;"><img src="./salmon_nigiri.svg" alt="salmon_nigiri" style="transform: rotate(332deg);"></span>
         <span class="icon" style="animation-delay: -26.6667s;"><img src="./tuna_nigiri.svg" alt="tuna_nigiri" style="transform: rotate(309deg);"></span>
         <span class="icon" style="animation-delay: -28.3333s;"><img src="./tuna_rolls.svg" alt="tuna_rolls" style="transform: rotate(309deg);"></span>
+      </div>
+
+      <div id="footer">
+        I created this Conveyor Belt Sushi Animation using pure CSS and SVG! Check out the <a href="https://github.com/harryli0088/conveyor-belt-sushi-animation" target="_blank" rel="noopener noreferrer">Github repo</a>!
       </div>
     </div>
   </body>
