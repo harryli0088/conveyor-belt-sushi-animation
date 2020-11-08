@@ -52,3 +52,12 @@ $offset-y: 100vh;
   }
 }
 ```
+
+
+## Draw SVG with JavaScript
+
+I made these custom SVG icons using my package https://github.com/harryli0088/svg_path_generator
+
+## License
+
+MIT License
