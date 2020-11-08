@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Conveyor Belt Sushi Animation Using Pure CSS"
+    />
+    <title>Conveyor Belt Sushi Animation</title>
+  </head>
+  <style>
+    :root {
+      --icon-size: 8vh;
+      --offset-x: -10vh;
+      --offset-y: 100vh;
+    }
+
+    body {
+      margin: 0;
+    }
+
+    #app {
+      text-align: center;
+      background-color: #002740;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .conveyorBeltAnimation {
+      position: relative;
+    }
+
+    .icon {
+      animation: conveyor-belt 30s linear;
+      animation-iteration-count: infinite;
+      position: absolute;
+      top: calc(-var(--icon-size) / 2);
+      left: calc(-var(--icon-size) / 2);
+    }
+
+    img {
+      width: var(--icon-size);
+      height: var(--icon-size);
+      border-radius: 50%;
+    }
+
+
+    @keyframes conveyor-belt {
+      0% {
+        transform: rotate(0) translateX( var(--offset-x)) translateY(calc(-1 * var(--offset-y))); /* start at the top, offset to the left */
+      }
+      43% { /* these percentages are hard-coded to the offset values at the top of the file to make the rotation look like it's moving at the same speed */
+        transform: rotate(0) translateX( var(--offset-x)) translateY(0); /* move to the bottom of the conveyer belt */
+      }
+      57% {
+        transform: rotate(-180deg) translateX( var(--offset-x)) translateY(0); /* rotate */
+      }
+      100% {
+        transform: rotate(-180deg) translateX( var(--offset-x)) translateY( var(--offset-y)); /* move back to the top, offset to the right */
+      }
+    }
+  </style>
+  <body>
+    <div id="app">
+      <div class="conveyorBeltAnimation">
+        <span class="icon" style="animation-delay: 0s;"><img src="./salmon_nigiri.svg" alt="salmon_nigiri" style="transform: rotate(219deg);"></span>
+        <span class="icon" style="animation-delay: -1.66667s;"><img src="./tuna_nigiri.svg" alt="tuna_nigiri" style="transform: rotate(238deg);"></span>
+        <span class="icon" style="animation-delay: -3.33333s;"><img src="./tuna_rolls.svg" alt="tuna_rolls" style="transform: rotate(35deg);"></span>
+        <span class="icon" style="animation-delay: -5s;"><img src="./salmon_nigiri.svg" alt="salmon_nigiri" style="transform: rotate(73deg);"></span>
+        <span class="icon" style="animation-delay: -6.66667s;"><img src="./tuna_nigiri.svg" alt="tuna_nigiri" style="transform: rotate(164deg);"></span>
+        <span class="icon" style="animation-delay: -8.33333s;"><img src="./tuna_rolls.svg" alt="tuna_rolls" style="transform: rotate(133deg);"></span>
+        <span class="icon" style="animation-delay: -10s;"><img src="./salmon_nigiri.svg" alt="salmon_nigiri" style="transform: rotate(295deg);"></span>
+        <span class="icon" style="animation-delay: -11.6667s;"><img src="./tuna_nigiri.svg" alt="tuna_nigiri" style="transform: rotate(69deg);"></span>
+        <span class="icon" style="animation-delay: -13.3333s;"><img src="./tuna_rolls.svg" alt="tuna_rolls" style="transform: rotate(304deg);"></span>
+        <span class="icon" style="animation-delay: -15s;"><img src="./salmon_nigiri.svg" alt="salmon_nigiri" style="transform: rotate(138deg);"></span>
+        <span class="icon" style="animation-delay: -16.6667s;"><img src="./tuna_nigiri.svg" alt="tuna_nigiri" style="transform: rotate(301deg);"></span>
+        <span class="icon" style="animation-delay: -18.3333s;"><img src="./tuna_rolls.svg" alt="tuna_rolls" style="transform: rotate(230deg);"></span>
+        <span class="icon" style="animation-delay: -20s;"><img src="./salmon_nigiri.svg" alt="salmon_nigiri" style="transform: rotate(39deg);"></span>
+        <span class="icon" style="animation-delay: -21.6667s;"><img src="./tuna_nigiri.svg" alt="tuna_nigiri" style="transform: rotate(294deg);"></span>
+        <span class="icon" style="animation-delay: -23.3333s;"><img src="./tuna_rolls.svg" alt="tuna_rolls" style="transform: rotate(49deg);"></span>
+        <span class="icon" style="animation-delay: -25s;"><img src="./salmon_nigiri.svg" alt="salmon_nigiri" style="transform: rotate(332deg);"></span>
+        <span class="icon" style="animation-delay: -26.6667s;"><img src="./tuna_nigiri.svg" alt="tuna_nigiri" style="transform: rotate(309deg);"></span>
+        <span class="icon" style="animation-delay: -28.3333s;"><img src="./tuna_rolls.svg" alt="tuna_rolls" style="transform: rotate(309deg);"></span>
+      </div>
+    </div>
+  </body>
+</html>
