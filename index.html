@@ -19,8 +19,8 @@
   </head>
   <style>
     :root {
-      --icon-size: 10vh;
-      --offset-x: -10vh;
+      --icon-size: 12vh;
+      --offset-x: -15vh;
       --offset-y: 100vh;
     }
 
@@ -64,10 +64,10 @@
       0% {
         transform: rotate(0) translateX( var(--offset-x)) translateY(calc(-1 * var(--offset-y))); /* start at the top, offset to the left */
       }
-      43% { /* these percentages are hard-coded to the offset values at the top of the file to make the rotation look like it's moving at the same speed */
+      41% { /* these percentages are hard-coded to the offset values at the top of the file to make the rotation look like it's moving at the same speed */
         transform: rotate(0) translateX( var(--offset-x)) translateY(0); /* move to the bottom of the conveyer belt */
       }
-      57% {
+      59% {
         transform: rotate(-180deg) translateX( var(--offset-x)) translateY(0); /* rotate */
       }
       100% {
