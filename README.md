@@ -58,6 +58,10 @@ $offset-y: 100vh;
 
 I made these custom SVG icons using my package https://github.com/harryli0088/svg_path_generator
 
+## Acknowledgements
+
+Thank you to my lovely wife Iris Yung for the inspiration and advice!
+
 ## License
 
 MIT License
