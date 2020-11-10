@@ -18,10 +18,10 @@ let i = 0
 while(i < NUM_ICONS) {
   const file = FILES[i % FILES.length]
 
-  //the first icon should not have an animation delay at all, otherwise it will render incorrectly on iOS (and many other platforms)
-  const animationDelay = i===0 ? "" : ` style="animation-delay: -${(i*ANIMATION_SECONDS/NUM_ICONS).toFixed(2)}s;"`
+  //the first icon should a slight animation delay, otherwise it will render incorrectly on iOS (and many other platforms)
+  const animationDelay = i===0 ? "0.01" : (i*ANIMATION_SECONDS/NUM_ICONS).toFixed(2)
   console.log(
-    `<span class="icon"${animationDelay}><img src="${file}" alt="${file}" style="transform: rotate(${Math.round(Math.random() * 360)});"></span>`
+    `<span class="icon" style="animation-delay: -${animationDelay}s;"><img src="${file}" alt="${file}" style="transform: rotate(${Math.round(Math.random() * 360)});"></span>`
   )
 
   ++i
