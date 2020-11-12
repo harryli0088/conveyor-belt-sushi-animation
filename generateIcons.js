@@ -11,7 +11,8 @@ const FILES = [
   "./unagi_nigiri.svg",
   "./alfonsino_nigiri.svg",
   "./mackerel_nigiri.svg",
-  "./tuna_rolls.svg"
+  "./tuna_rolls.svg",
+  "./tofu.svg",
 ]
 
 let i = 0
