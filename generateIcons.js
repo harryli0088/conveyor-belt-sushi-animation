@@ -22,7 +22,7 @@ while(i < NUM_ICONS) {
   //the first icon should a slight animation delay, otherwise it will render incorrectly on iOS (and many other platforms)
   const animationDelay = i===0 ? "0.01" : (i*ANIMATION_SECONDS/NUM_ICONS).toFixed(2)
   console.log(
-    `<span class="icon" style="animation-delay: -${animationDelay}s;"><img src="${file}" alt="${file}" style="transform: rotate(${Math.round(Math.random() * 360)});"></span>`
+    `<span class="icon" style="animation-delay: -${animationDelay}s;"><img src="${file}" alt="${file}" style="transform: rotate(${Math.round(Math.random() * 360)}deg);"></span>`
   )
 
   ++i
