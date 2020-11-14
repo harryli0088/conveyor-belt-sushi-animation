@@ -1,7 +1,7 @@
 //this file is used to generate the HTML icons
 //copy and paste the console output of this file into index.html
 
-const NUM_ICONS = 18
+const NUM_ICONS = 14
 const ANIMATION_SECONDS = 30
 const FILES = [
   "./salmon_nigiri.svg",
