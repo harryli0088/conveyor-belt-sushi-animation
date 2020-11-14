@@ -57,6 +57,10 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
+    .icon.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
 
     img {
       width: var(--icon-size);
@@ -230,6 +234,7 @@
           //3) transition it at the correct angle like it's being pulled away
           //4) delete the clone
 
+          //if the plate already has the hidden class, the pointer-events:none rule will prevent this event from firing
 
           const {
             estimatedWaitTime, //estimate when the plate will be off screen to make it appear again for the next cycle
@@ -241,9 +246,9 @@
           } = calculatePlatePickUpData(e)
 
           //1)
-          icons[i].style.opacity = "0" //make it seem like the plate was taken by the user
+          icons[i].classList.add("hidden") //make it seem like the plate was taken by the user
           setTimeout(
-            () => icons[i].style.opacity = "1", //put the plate back on the conveyor belt
+            () => icons[i].classList.remove("hidden"), //put the plate back on the conveyor belt
             estimatedWaitTime,
           )
 
