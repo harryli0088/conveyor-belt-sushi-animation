@@ -1,6 +1,6 @@
 # Conveyor Belt Sushi Animation
 
-I've been playing around with CSS and made this fun animation!
+I created this Conveyor Belt Sushi Animation using CSS animation, SVG icons, and JavaScript interactions!
 
 https://harryli0088.github.io/conveyor-belt-sushi-animation/
 

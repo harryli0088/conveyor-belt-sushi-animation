@@ -50,7 +50,7 @@
       animation: conveyor-belt 30s linear;
       animation-iteration-count: infinite;
       position: absolute;
-      top: 5vh;
+      top: 0;
       left: calc(-1 * var(--icon-size) / 2);
       cursor: pointer;
 
@@ -151,109 +151,133 @@
       </div>
 
       <div id="footer">
-        <div>I created this Conveyor Belt Sushi Animation using pure CSS and SVG!</div>
-        <div>
-          Interactions are done with JavaScript. Check out the <a href="https://github.com/harryli0088/conveyor-belt-sushi-animation" target="_blank" rel="noopener noreferrer">Github repo</a>!
-        </div>
+        <div>I created this Conveyor Belt Sushi Animation using CSS animation, SVG icons, and JavaScript interactions! Check out the <a href="https://github.com/harryli0088/conveyor-belt-sushi-animation" target="_blank" rel="noopener noreferrer">Github repo</a>!</div>
       </div>
     </div>
 
     <script>
       //The conveyor belt animation itself is CSS only. The interactions require JS
-      const icons = document.getElementsByClassName("icon")
+
+      /**
+       * given the icon click event, calculate data for the plate pick-up animation
+       * @param  {Event} e  the click event
+       * @return {Object}   object with fields "iconCenterX", "iconCenterY", "estimatedWaitTime", "transform0", "transform1", "transform2"
+       */
+      function calculatePlatePickUpData(e) { //manually estimate how long we need to timeout before putting the plate back
+        const CSS_ANIMATION_MS = 30000 //set in CSS
+        const SCALE = 1.2 //hard coded pick up scale
+        const TRANSLATE = 50 //card coded pick up translate distance
+
+        const height = window.innerHeight
+        const width = window.innerWidth
+        const cssIconRadius = height * 3/25 / 2 //set in CSS
+        const cssOffsetX = height * 3/20 //set in CSS
+
+        const boundingRect = e.target.getBoundingClientRect() //get the bounding rectangle on the icon
+        const iconCenterX = boundingRect.left + boundingRect.width/2 //get the center x of the icon
+        const iconCenterY = boundingRect.top + boundingRect.height/2 //get the center y of the icon
+        const sameReturnData = { iconCenterX, iconCenterY }
+
+        const offsetX = iconCenterX - (width / 2) //how far to the left or right from center the icon is
+        //how far vertically straight the icons move on the left and right, excluding the bend
+        const straightDy = height/2 + cssIconRadius //implied by CSS, since icons are centered, then have a top of 5vh, then move down by half their radius
+
+        const progressY = iconCenterY / straightDy //if <1, the icon is moving on the left or right, else >1 the icon is moving around the bend
+        if(progressY < 1) { //if the user clicked on the left or right side
+          if(Math.abs(-cssOffsetX - offsetX) <= cssIconRadius) { //if user clicked on the left side
+            return {
+              ...sameReturnData,
+              estimatedWaitTime: (2 - progressY) * CSS_ANIMATION_MS / 2, //wait until the plate is off the screen to make it appear again, simplified from ( 1 - progressY ) * CSS_ANIMATION_MS/2 + CSS_ANIMATION_MS/2
+              transform0: ``, //we don't need to do anything here
+              transform1: `scale(${SCALE})`, //pick up the plate
+              transform2: `translate(-${TRANSLATE}px,0) scale(${SCALE})`, //move the plate away to the left
+            }
+          }
+          else { //else user clicked on the right side
+            return {
+              ...sameReturnData,
+              estimatedWaitTime: progressY * CSS_ANIMATION_MS / 2, //wait until the plate is off the screen to make it appear again
+              transform0: `rotate(-180deg)`, //maintain the rotation
+              transform1: `scale(${SCALE}) rotate(-180deg)`, //pick up the plate
+              transform2: `translate(${TRANSLATE}px,0) scale(${SCALE}) rotate(-180deg)`, //move the plate away to the right
+            }
+          }
+        }
+
+        //else user clicked at the bend
+        const offsetY = iconCenterY - straightDy //get boy much vertically into the bend the icon is
+        const translateX = TRANSLATE * offsetX / cssOffsetX
+        const translateY = TRANSLATE * offsetY / cssOffsetX
+        const rotateAngle = -Math.atan(translateX/translateY) * 180 / Math.PI - 90 //we want to maintain the rotation: 0 left, -90 down, -180 right
+
+        return {
+          ...sameReturnData,
+          estimatedWaitTime: CSS_ANIMATION_MS / 2, //waiting half the animation time is good enough
+          transform0: `rotate(${rotateAngle}deg)`, //maintain the rotation
+          transform1: `scale(${SCALE}) rotate(${rotateAngle}deg)`, //pick up the plate
+          transform2: `translate(${translateX}px,${translateY}px) scale(${SCALE}) rotate(${rotateAngle}deg)`, //move the plate away at the right angle
+        }
+      }
+
+
+      //add the event listeners to the icons
+      const icons = document.getElementsByClassName("icon") //get all the icons
       for(let i=0; i<icons.length; ++i) {
         icons[i].addEventListener("click", (e) => { //attach on click listeners
+          //to make it look like we pick up the plate, we
+          //1) make the icon disappear, then make it reappear when it is off screen
+          //2) clone the icon
+          //3) transition it at the correct angle like it's being pulled away
+          //4) delete the clone
+
+
           const {
             estimatedWaitTime, //estimate when the plate will be off screen to make it appear again for the next cycle
+            iconCenterX,
+            iconCenterY,
             transform0,
             transform1,
             transform2,
-          } = getPositionData(e)
+          } = calculatePlatePickUpData(e)
 
+          //1)
           icons[i].style.opacity = "0" //make it seem like the plate was taken by the user
           setTimeout(
             () => icons[i].style.opacity = "1", //put the plate back on the conveyor belt
             estimatedWaitTime,
           )
 
-          const boundingRect = e.target.getBoundingClientRect()
-          const pickedUpPlateContainer = document.createElement("div")
+          //2)
+          const pickedUpPlateContainer = document.createElement("div") //create a plate container element that will set the fixed position and center the inner content
           pickedUpPlateContainer.classList.add("picked-up-plate-container")
-          pickedUpPlateContainer.style.top = `${boundingRect.top + boundingRect.height/2}px`
-          pickedUpPlateContainer.style.left = `${boundingRect.left + boundingRect.width/2}px`
-          const pickedUpPlate = document.createElement("div")
+          pickedUpPlateContainer.style.top = `${iconCenterY}px`
+          pickedUpPlateContainer.style.left = `${iconCenterX}px`
+          const pickedUpPlate = document.createElement("div") //create the plate element that will be "animated" using CSS transition
           pickedUpPlate.classList.add("picked-up-plate")
-          pickedUpPlate.appendChild(e.target.cloneNode(true))
-          pickedUpPlateContainer.appendChild(pickedUpPlate)
-          document.getElementById("app").appendChild(pickedUpPlateContainer)
+          pickedUpPlate.appendChild(e.target.cloneNode(true)) //clone the img and append it to the plate
+          pickedUpPlateContainer.appendChild(pickedUpPlate) //append the plate to the plate container
+          document.getElementById("app").appendChild(pickedUpPlateContainer) //append the plate container to the app
 
-          pickedUpPlate.style.transform = transform0
+          //3)
+          pickedUpPlate.style.transform = transform0 //set the initial transform
           setTimeout(
-            () => pickedUpPlate.style.transform = transform1,
-            50,
+            () => pickedUpPlate.style.transform = transform1, //set the first transition style
+            30, //wait a little so the initial style takes effect, then we can transition to the first transition style
           )
           setTimeout(
-            () => {
+            () => { //set the second transition style
               pickedUpPlate.style.transform = transform2
               pickedUpPlate.style.opacity = 0
             },
-            500,
+            500, //0.5s set in CSS
           )
+
+          //4)
           setTimeout(
-            () => pickedUpPlateContainer.remove(),
-            1000,
+            () => pickedUpPlateContainer.remove(), //remove the plate container when our animation is done
+            1000, //0.5s * 2 = 1s
           )
         })
-      }
-
-      function getPositionData(e) { //manually estimate how long we need to timeout before putting the plate back
-        const CSS_ANIMATION_MS = 30000 //set in CSS
-        const width = window.innerWidth
-        const height = window.innerHeight
-        const clientX = e.clientX
-        const clientY = e.clientY
-
-        const cssIconTop = height / 20 //set in CSS
-        const cssIconRadius = height * 3/25 / 2 //set in CSS
-        const cssOffsetX = - height * 3/20 //set in CSS
-        const onScreenDy = height / 2 + cssIconTop //implied by CSS, since icons are centered, then have a top of 5vh
-        const offsetX = clientX - (width / 2)
-
-        const progressY = clientY / onScreenDy //how close the click was to the maximum icon y position
-        const SCALE = 1.2
-        const TRANSLATE = 50
-        if(progressY < 1) { //if the user clicked on the left or right side
-          if(Math.abs(cssOffsetX - offsetX) <= cssIconRadius) { //if user clicked on the left side
-            return {
-              estimatedWaitTime: (2 - progressY) * CSS_ANIMATION_MS / 2, //simplified from ( 1 - progressY ) * CSS_ANIMATION_MS/2 + CSS_ANIMATION_MS/2
-              transform0: ``,
-              transform1: `scale(${SCALE})`,
-              transform2: `translate(-${TRANSLATE}px,0) scale(${SCALE})`,
-            }
-          }
-          else { //else user clicked on the right side
-            return {
-              estimatedWaitTime: progressY * CSS_ANIMATION_MS / 2,
-              transform0: `rotate(-180deg)`,
-              transform1: `scale(${SCALE}) rotate(-180deg)`,
-              transform2: `translate(${TRANSLATE}px,0) scale(${SCALE}) rotate(-180deg)`,
-            }
-          }
-        }
-
-        const bendProgress = 0.5
-        const bendAngle = 180 //180 almost completely left, 90 almost completely down, 0 almost completely 0
-
-        const translateX = TRANSLATE * Math.cos(bendAngle * Math.PI)
-        const translateY = TRANSLATE * Math.sin(bendAngle * Math.PI)
-
-        //else user clicked at the bend
-        return {
-          estimatedWaitTime: CSS_ANIMATION_MS / 2,
-          transform0: ``,
-          transform1: `scale(${SCALE})`,
-          transform2: `translate(-${translateX}px,${translateY}px) scale(${SCALE})`,
-        }
       }
     </script>
   </body>
