@@ -34,7 +34,7 @@
       position: relative;
       text-align: center;
       background: rgb(0,68,111);
-background: linear-gradient(135deg, rgba(0,68,111,1) 0%, rgba(0,39,64,1) 100%);
+      background: linear-gradient(135deg, rgba(0,68,111,1) 0%, rgba(0,39,64,1) 100%);
       height: 100vh;
       display: flex;
       align-items: center;
@@ -42,7 +42,7 @@ background: linear-gradient(135deg, rgba(0,68,111,1) 0%, rgba(0,39,64,1) 100%);
       overflow: hidden;
     }
 
-    .conveyorBeltAnimation {
+    .conveyor-belt-animation {
       position: relative;
     }
 
@@ -52,11 +52,27 @@ background: linear-gradient(135deg, rgba(0,68,111,1) 0%, rgba(0,39,64,1) 100%);
       position: absolute;
       top: 5vh;
       left: calc(-1 * var(--icon-size) / 2);
+      cursor: pointer;
+
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
 
     img {
       width: var(--icon-size);
       height: var(--icon-size);
+    }
+
+    .picked-up-plate-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+    }
+
+    .picked-up-plate {
+      transition: 0.5s;
+      /* box-shadow: 0 0 10px rgba(0,0,0,0.2); */
     }
 
 
@@ -72,6 +88,22 @@ background: linear-gradient(135deg, rgba(0,68,111,1) 0%, rgba(0,39,64,1) 100%);
       }
       100% {
         transform: rotate(-180deg) translateX( var(--offset-x)) translateY( var(--offset-y)); /* move back to the top, offset to the right */
+      }
+    }
+
+
+    @keyframes pick-up-plate {
+      0% {
+        transform: translate(0,0) scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: translate(0,0) scale(1.2);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50px,0) scale(1.2);
+        opacity: 0;
       }
     }
 
@@ -95,7 +127,7 @@ background: linear-gradient(135deg, rgba(0,68,111,1) 0%, rgba(0,39,64,1) 100%);
   </style>
   <body>
     <div id="app">
-      <div class="conveyorBeltAnimation">
+      <div class="conveyor-belt-animation">
         <!-- these spans are assigned evenly spaced out animation delays -->
         <!-- the imgs are assigned random rotations -->
         <span class="icon" style="animation-delay: -0.01s;"><img src="./salmon_nigiri.svg" alt="./salmon_nigiri.svg" style="transform: rotate(129deg);"></span>
@@ -119,8 +151,110 @@ background: linear-gradient(135deg, rgba(0,68,111,1) 0%, rgba(0,39,64,1) 100%);
       </div>
 
       <div id="footer">
-        I created this Conveyor Belt Sushi Animation using pure CSS and SVG! Check out the <a href="https://github.com/harryli0088/conveyor-belt-sushi-animation" target="_blank" rel="noopener noreferrer">Github repo</a>!
+        <div>I created this Conveyor Belt Sushi Animation using pure CSS and SVG!</div>
+        <div>
+          Interactions are done with JavaScript. Check out the <a href="https://github.com/harryli0088/conveyor-belt-sushi-animation" target="_blank" rel="noopener noreferrer">Github repo</a>!
+        </div>
       </div>
     </div>
+
+    <script>
+      //The conveyor belt animation itself is CSS only. The interactions require JS
+      const icons = document.getElementsByClassName("icon")
+      for(let i=0; i<icons.length; ++i) {
+        icons[i].addEventListener("click", (e) => { //attach on click listeners
+          const {
+            estimatedWaitTime, //estimate when the plate will be off screen to make it appear again for the next cycle
+            transform0,
+            transform1,
+            transform2,
+          } = getPositionData(e)
+
+          icons[i].style.opacity = "0" //make it seem like the plate was taken by the user
+          setTimeout(
+            () => icons[i].style.opacity = "1", //put the plate back on the conveyor belt
+            estimatedWaitTime,
+          )
+
+          const boundingRect = e.target.getBoundingClientRect()
+          const pickedUpPlateContainer = document.createElement("div")
+          pickedUpPlateContainer.classList.add("picked-up-plate-container")
+          pickedUpPlateContainer.style.top = `${boundingRect.top + boundingRect.height/2}px`
+          pickedUpPlateContainer.style.left = `${boundingRect.left + boundingRect.width/2}px`
+          const pickedUpPlate = document.createElement("div")
+          pickedUpPlate.classList.add("picked-up-plate")
+          pickedUpPlate.appendChild(e.target.cloneNode(true))
+          pickedUpPlateContainer.appendChild(pickedUpPlate)
+          document.getElementById("app").appendChild(pickedUpPlateContainer)
+
+          pickedUpPlate.style.transform = transform0
+          setTimeout(
+            () => pickedUpPlate.style.transform = transform1,
+            50,
+          )
+          setTimeout(
+            () => {
+              pickedUpPlate.style.transform = transform2
+              pickedUpPlate.style.opacity = 0
+            },
+            500,
+          )
+          setTimeout(
+            () => pickedUpPlateContainer.remove(),
+            1000,
+          )
+        })
+      }
+
+      function getPositionData(e) { //manually estimate how long we need to timeout before putting the plate back
+        const CSS_ANIMATION_MS = 30000 //set in CSS
+        const width = window.innerWidth
+        const height = window.innerHeight
+        const clientX = e.clientX
+        const clientY = e.clientY
+
+        const cssIconTop = height / 20 //set in CSS
+        const cssIconRadius = height * 3/25 / 2 //set in CSS
+        const cssOffsetX = - height * 3/20 //set in CSS
+        const onScreenDy = height / 2 + cssIconTop //implied by CSS, since icons are centered, then have a top of 5vh
+        const offsetX = clientX - (width / 2)
+
+        const progressY = clientY / onScreenDy //how close the click was to the maximum icon y position
+        const SCALE = 1.2
+        const TRANSLATE = 50
+        if(progressY < 1) { //if the user clicked on the left or right side
+          if(Math.abs(cssOffsetX - offsetX) <= cssIconRadius) { //if user clicked on the left side
+            return {
+              estimatedWaitTime: (2 - progressY) * CSS_ANIMATION_MS / 2, //simplified from ( 1 - progressY ) * CSS_ANIMATION_MS/2 + CSS_ANIMATION_MS/2
+              transform0: ``,
+              transform1: `scale(${SCALE})`,
+              transform2: `translate(-${TRANSLATE}px,0) scale(${SCALE})`,
+            }
+          }
+          else { //else user clicked on the right side
+            return {
+              estimatedWaitTime: progressY * CSS_ANIMATION_MS / 2,
+              transform0: `rotate(-180deg)`,
+              transform1: `scale(${SCALE}) rotate(-180deg)`,
+              transform2: `translate(${TRANSLATE}px,0) scale(${SCALE}) rotate(-180deg)`,
+            }
+          }
+        }
+
+        const bendProgress = 0.5
+        const bendAngle = 180 //180 almost completely left, 90 almost completely down, 0 almost completely 0
+
+        const translateX = TRANSLATE * Math.cos(bendAngle * Math.PI)
+        const translateY = TRANSLATE * Math.sin(bendAngle * Math.PI)
+
+        //else user clicked at the bend
+        return {
+          estimatedWaitTime: CSS_ANIMATION_MS / 2,
+          transform0: ``,
+          transform1: `scale(${SCALE})`,
+          transform2: `translate(-${translateX}px,${translateY}px) scale(${SCALE})`,
+        }
+      }
+    </script>
   </body>
 </html>
